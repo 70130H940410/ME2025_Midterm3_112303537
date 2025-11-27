@@ -46,16 +46,15 @@ function selectCategory() {
 
     if (!category) return;   // 沒選類別就不打 API
 
-    // ★這裡假設後端提供 /product?category=飲料 之類的 API
     fetch(`/product?category=${encodeURIComponent(category)}`)
         .then(res => {
             if (!res.ok) throw new Error("取得商品列表失敗");
             return res.json();
         })
         .then(data => {
-            // data 可能是 ["可樂","雪碧"] 或 [{name:"可樂"},...]
-            data.forEach(item => {
-                const name = (typeof item === "string") ? item : item.name;
+            // 後端回傳格式：{ product: ["珍珠奶茶","冰美式咖啡", ...] }
+            const list = data.product || [];
+            list.forEach(name => {
                 const opt = document.createElement("option");
                 opt.value = name;
                 opt.textContent = name;
@@ -81,8 +80,8 @@ function selectProduct() {
         return;
     }
 
-    // ★這裡假設後端提供 /product?name=可樂 之類的 API 回傳 {price: 35}
-    fetch(`/product?name=${encodeURIComponent(productName)}`)
+    // 後端提供 /product?product=可樂  回傳 {price: 35}
+    fetch(`/product?product=${encodeURIComponent(productName)}`)
         .then(res => {
             if (!res.ok) throw new Error("取得單價失敗");
             return res.json();
