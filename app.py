@@ -12,7 +12,7 @@ def index():
     return render_template('form.html', orders=orders, warning=warning)
 
 
-# --------------------- 這裡是 /product 路由 ---------------------
+# --------------------- /product 路由 ---------------------
 @app.route('/product', methods=['GET', 'POST', 'DELETE'])
 def product():
     # 1. GET：查詢商品名稱清單或單價
@@ -36,15 +36,31 @@ def product():
 
     # 2. POST：新增訂單
     elif request.method == 'POST':
-        # 這裡的 key 要跟你的 form name 對應，如果不一樣再自己調整
+        # 這裡的欄位名稱對應 form.html 裡的 name
+        # form 的 name 應該是：
+        # order_date, customer_name, category, product, price, quantity, subtotal, status, note
+        qty_str = request.form.get('quantity', '0') or '0'
+        subtotal_str = request.form.get('subtotal', '0') or '0'
+
+        try:
+            quantity = int(qty_str)
+        except ValueError:
+            quantity = 0
+
+        try:
+            # '60.00' 先轉 float 再轉 int -> 60
+            total = int(float(subtotal_str))
+        except ValueError:
+            total = 0
+
         order_data = {
-            'product_date':  request.form.get('product_date'),
+            'product_date':  request.form.get('order_date'),   # 日期 → order_list.date
             'customer_name': request.form.get('customer_name'),
-            'product_name':  request.form.get('product_name'),
-            'product_amount': int(request.form.get('product_amount', 0)),
-            'product_total':  int(request.form.get('product_total', 0)),
-            'product_status': request.form.get('product_status'),
-            'product_note':   request.form.get('product_note', "")
+            'product_name':  request.form.get('product'),      # 商品名稱 → order_list.product
+            'product_amount': quantity,                        # 數量 → order_list.amount
+            'product_total':  total,                           # 小計 → order_list.total
+            'product_status': request.form.get('status'),
+            'product_note':   request.form.get('note', "")
         }
 
         db.add_order(order_data)
@@ -67,3 +83,4 @@ def product():
 # --------------------- 程式入口 ---------------------
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5500, debug=True)
+
