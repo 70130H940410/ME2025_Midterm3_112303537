@@ -1,5 +1,75 @@
 {% extends 'index.html' %}
 
 {% block form %}
+<form method="post" action="/product">
+    <!-- 客戶名稱 -->
+    <div>
+        <label for="customer_name">客戶名稱：</label>
+        <input type="text" id="customer_name" name="customer_name" required>
+    </div>
 
-{% endblock%}
+    <!-- 日期：預設今天，JS 會自動填 -->
+    <div>
+        <label for="order_date">日期：</label>
+        <input type="date" id="order_date" name="order_date" required>
+    </div>
+
+    <!-- 商品種類 -->
+    <div>
+        <label for="category">商品種類：</label>
+        <select id="category" name="category" required>
+            <option value="">請選擇種類</option>
+            <option value="飲料">飲料</option>
+            <option value="點心">點心</option>
+            <!-- 看後端資料庫實際有哪些種類再加 -->
+        </select>
+    </div>
+
+    <!-- 商品名稱：由 selectCategory() 動態更新 -->
+    <div>
+        <label for="product">商品名稱：</label>
+        <select id="product" name="product" required>
+            <option value="">請先選擇商品種類</option>
+        </select>
+    </div>
+
+    <!-- 單價：由 selectProduct() 自動帶入 -->
+    <div>
+        <label for="price">單價：</label>
+        <input type="number" id="price" name="price" min="0" step="1" required>
+    </div>
+
+    <!-- 數量：必須大於 0，預設 1 -->
+    <div>
+        <label for="quantity">數量：</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+    </div>
+
+    <!-- 小計：單價 × 數量，自動計算 -->
+    <div>
+        <label for="subtotal">小計：</label>
+        <input type="number" id="subtotal" name="subtotal" readonly>
+    </div>
+
+    <!-- 狀態：預設「未付款」 -->
+    <div>
+        <label for="status">狀態：</label>
+        <select id="status" name="status" required>
+            <option value="未付款" selected>未付款</option>
+            <option value="已付款">已付款</option>
+            <option value="已完成">已完成</option>
+        </select>
+    </div>
+
+    <!-- 備註 -->
+    <div>
+        <label for="note">備註：</label>
+        <textarea id="note" name="note" rows="3"></textarea>
+    </div>
+
+    <div style="margin-top:10px;">
+        <button type="submit">送出</button>
+        <button type="button" onclick="close_input_table()">取消</button>
+    </div>
+</form>
+{% endblock %}
