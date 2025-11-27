@@ -39,7 +39,7 @@ cd "$PROJECT_DIR"
 ########################################
 
 # 這個情境是：deploy.sh 放在一個空資料夾裡，旁邊沒有專案
-if [ ! -d "$PROJECT_DIR/.git" ] && [ "$SCRIPT_DIR" != "$PROJECT_DIR" ]; then
+if [ ! -d "$PROJECT_DIR/.git" ] && [ ! -f "$PROJECT_DIR/app.py" ]; then
     echo "=== 首次部署：自動 clone repository、建立虛擬環境、安裝套件並啟動 app.py ==="
     echo "開始 git clone：$REPO_URL -> $PROJECT_NAME"
 

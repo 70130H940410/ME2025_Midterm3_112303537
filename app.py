@@ -36,31 +36,65 @@ def product():
 
     # 2. POST：新增訂單
     elif request.method == 'POST':
-        # 這裡的欄位名稱對應 form.html 裡的 name
-        # form 的 name 應該是：
-        # order_date, customer_name, category, product, price, quantity, subtotal, status, note
-        qty_str = request.form.get('quantity', '0') or '0'
-        subtotal_str = request.form.get('subtotal', '0') or '0'
+        # 同時支援底線命名（單元測試）與 dash 命名（前端 form）
+        product_date = (
+            request.form.get('product_date')
+            or request.form.get('order_date')
+            or request.form.get('product-date')
+        )
+        customer_name = (
+            request.form.get('customer_name')
+            or request.form.get('customer-name')
+        )
+        product_name = (
+            request.form.get('product_name')
+            or request.form.get('product')
+            or request.form.get('product-name')
+        )
 
-        try:
-            quantity = int(qty_str)
-        except ValueError:
-            quantity = 0
+        amount_raw = (
+            request.form.get('product_amount')
+            or request.form.get('product-amount')
+            or request.form.get('quantity')
+            or '0'
+        )
+        total_raw = (
+            request.form.get('product_total')
+            or request.form.get('product-total')
+            or request.form.get('subtotal')
+            or '0'
+        )
 
-        try:
-            # '60.00' 先轉 float 再轉 int -> 60
-            total = int(float(subtotal_str))
-        except ValueError:
-            total = 0
+        status = (
+            request.form.get('product_status')
+            or request.form.get('status')
+            or request.form.get('product-status')
+        )
+        note = (
+            request.form.get('product_note')
+            or request.form.get('note')
+            or request.form.get('product-note')
+            or ""
+        )
+
+        def to_int(value):
+            """安全地把表單字串轉成整數，支援 '60' / '60.0' / '60.00'。"""
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                try:
+                    return int(float(value))
+                except (TypeError, ValueError):
+                    return 0
 
         order_data = {
-            'product_date':  request.form.get('order_date'),   # 日期 → order_list.date
-            'customer_name': request.form.get('customer_name'),
-            'product_name':  request.form.get('product'),      # 商品名稱 → order_list.product
-            'product_amount': quantity,                        # 數量 → order_list.amount
-            'product_total':  total,                           # 小計 → order_list.total
-            'product_status': request.form.get('status'),
-            'product_note':   request.form.get('note', "")
+            'product_date': product_date,
+            'customer_name': customer_name,
+            'product_name': product_name,
+            'product_amount': to_int(amount_raw),
+            'product_total': to_int(total_raw),
+            'product_status': status,
+            'product_note': note,
         }
 
         db.add_order(order_data)
